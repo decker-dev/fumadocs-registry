@@ -1,0 +1,75 @@
+{
+  "name": "fumadocs-registry",
+  "version": "0.1.0",
+  "description": "Automatic shadcn registry generation for component libraries built with Fumadocs",
+  "keywords": [
+    "fumadocs",
+    "shadcn",
+    "registry",
+    "components",
+    "documentation"
+  ],
+  "homepage": "https://github.com/commet-billing/fumadocs-registry",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commet-billing/fumadocs-registry"
+  },
+  "license": "MIT",
+  "author": "Commet",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./plugin": {
+      "import": "./dist/plugin.js",
+      "types": "./dist/plugin.d.ts"
+    },
+    "./remark": {
+      "import": "./dist/remark-plugin.js",
+      "types": "./dist/remark-plugin.d.ts"
+    }
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "fumadocs-registry": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "biome check",
+    "format": "biome format --write",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "picocolors": "^1.1.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.8",
+    "@types/mdast": "^4.0.4",
+    "@types/node": "^24.10.2",
+    "mdast-util-mdx-jsx": "^3.2.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.0.0",
+    "vfile": "^6.0.3"
+  },
+  "peerDependencies": {
+    "fumadocs-mdx": ">=14.0.0"
+  },
+  "peerDependenciesMeta": {
+    "fumadocs-mdx": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
+
