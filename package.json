@@ -1,6 +1,6 @@
 {
   "name": "fumadocs-registry",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Automatic shadcn registry generation for component libraries built with Fumadocs",
   "keywords": [
     "fumadocs",
@@ -9,10 +9,10 @@
     "components",
     "documentation"
   ],
-  "homepage": "https://github.com/commet-billing/fumadocs-registry",
+  "homepage": "https://github.com/decker-dev/fumadocs-registry",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commet-billing/fumadocs-registry"
+    "url": "https://github.com/decker-dev/fumadocs-registry"
   },
   "license": "MIT",
   "author": "Commet",

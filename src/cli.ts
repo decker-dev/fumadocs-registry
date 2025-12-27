@@ -54,7 +54,7 @@ ${pc.dim("Options:")}
 }
 
 function printVersion() {
-  console.log("fumadocs-registry v0.2.0");
+  console.log("fumadocs-registry v0.2.1");
 }
 
 async function fileExists(filePath: string): Promise<boolean> {
