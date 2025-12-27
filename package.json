@@ -1,6 +1,6 @@
 {
   "name": "fumadocs-registry",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Automatic shadcn registry generation for component libraries built with Fumadocs",
   "keywords": [
     "fumadocs",
@@ -37,7 +37,8 @@
     "fumadocs-registry": "./dist/cli.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "templates"
   ],
   "scripts": {
     "build": "tsup",

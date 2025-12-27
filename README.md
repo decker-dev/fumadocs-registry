@@ -4,42 +4,32 @@ Automatic [shadcn registry](https://ui.shadcn.com/docs/registry) generation for 
 
 ## Features
 
-- Auto-detect exports from component files
-- Auto-detect dependencies (npm + shadcn)
-- Generate registry.json and component JSONs
-- Generate demo blocks from `<ComponentPreview>` in MDX
-- Remark plugin for automatic code injection
+- Auto-generates `registry.json` and component JSONs
+- Auto-injects code into `<ComponentPreview>` in MDX
+- Extracts exports and dependencies automatically
+- Zero manual configuration for component metadata
 
-## Installation
+## Quick Start
 
 ```bash
 pnpm add fumadocs-registry
 ```
 
+Run the init command to set up your project:
+
+```bash
+npx fumadocs-registry init
+```
+
+This creates:
+- `registry.config.ts` - Configuration file
+- `src/components/docs/component-preview.tsx` - Preview component
+
 ## Setup
 
-Create `registry.config.ts`:
+### 1. Add the remark plugin
 
-```ts
-import type { PluginOptions } from "fumadocs-registry";
-
-export default {
-  baseUrl: "https://myui.com/r",
-  registry: { name: "myui" },
-} satisfies PluginOptions;
-```
-
-Add to `package.json`:
-
-```json
-{
-  "scripts": {
-    "build:registry": "fumadocs-registry"
-  }
-}
-```
-
-Add remark plugin to `source.config.ts`:
+In `source.config.ts`:
 
 ```ts
 import { remarkComponentPreview } from "fumadocs-registry/remark";
@@ -51,59 +41,131 @@ export default defineConfig({
 });
 ```
 
+### 2. Register the component
+
+In `mdx-components.tsx`:
+
+```tsx
+import { ComponentPreview } from "@/components/docs/component-preview";
+
+export function useMDXComponents(components: MDXComponents) {
+  return {
+    ComponentPreview,
+    ...components,
+  };
+}
+```
+
+### 3. Add build script
+
+In `package.json`:
+
+```json
+{
+  "scripts": {
+    "build": "fumadocs-registry && next build"
+  }
+}
+```
+
 ## Usage
 
-Run:
-
-```bash
-pnpm build:registry
-```
-
-## Config Options
-
-```ts
-export default {
-  // Required
-  baseUrl: "https://myui.com/r",
-
-  // Optional
-  registry: {
-    name: "myui",           // default: "components"
-    homepage: "https://myui.com",
-  },
-  componentsDir: "src/registry",  // default: "src/registry"
-  componentsDirs: [               // default: [{ name: "ui", type: "ui" }, { name: "lib", type: "lib" }]
-    { name: "ui", type: "ui" },
-    { name: "hooks", type: "lib" },
-  ],
-  docsDirs: ["content/docs/components"],  // default: ["content/docs/components"]
-  outputDir: "public/r",                   // default: "public/r"
-} satisfies PluginOptions;
-```
-
-## How It Works
-
-1. Write component in `src/registry/ui/my-button.tsx`
-2. Document in `content/docs/components/my-button.mdx`:
+Write your component documentation using `<ComponentPreview>`:
 
 ```mdx
----
-title: My Button
-description: A button component.
----
-
-<ComponentPreview component="my-button" example="preview">
-  <MyButton>Click</MyButton>
+<ComponentPreview component="button" example="preview">
+  <Button>Click me</Button>
 </ComponentPreview>
 ```
 
-3. Run `fumadocs-registry`
-4. Generated in `public/r/`:
-   - `registry.json`
-   - `my-button.json`
-   - `my-button-demo-preview.json`
+The plugin automatically:
+1. Injects the source code as the `code` prop
+2. Generates registry JSON files in `public/r/`
+3. Creates demo blocks for v0.dev integration
+
+## Configuration
+
+Create `registry.config.ts` in your project root:
+
+```ts
+import type { PluginOptions } from "fumadocs-registry";
+
+export default {
+  // Required: Base URL where registry files are served
+  baseUrl: "https://myui.com/r",
+
+  // Optional: Registry metadata
+  registry: {
+    name: "myui",
+    homepage: "https://myui.com",
+  },
+
+  // Optional: Component directories (default: [{ name: "ui", type: "ui" }])
+  componentsDirs: [
+    { name: "ui", type: "ui" },
+    { name: "animated", type: "ui" },
+    { name: "lib", type: "lib" },
+  ],
+
+  // Optional: Docs directories to scan (default: ["content/docs/components"])
+  docsDirs: [
+    "content/docs/components",
+    "content/docs/animated",
+  ],
+
+  // Optional: Other settings
+  componentsDir: "src/registry",  // Default: "src/registry"
+  outputDir: "public/r",          // Default: "public/r"
+} satisfies PluginOptions;
+```
+
+## Project Structure
+
+Expected directory structure:
+
+```
+your-project/
+├── src/
+│   ├── registry/
+│   │   ├── ui/
+│   │   │   ├── button.tsx
+│   │   │   └── card.tsx
+│   │   └── lib/
+│   │       └── utils.ts
+│   └── components/
+│       └── docs/
+│           └── component-preview.tsx
+├── content/
+│   └── docs/
+│       └── components/
+│           ├── button.mdx
+│           └── card.mdx
+├── public/
+│   └── r/                # Generated (auto-created)
+└── registry.config.ts
+```
+
+## CLI Commands
+
+```bash
+# Initialize a new project
+fumadocs-registry init
+
+# Build the registry
+fumadocs-registry
+
+# Show help
+fumadocs-registry --help
+```
+
+## Output
+
+The plugin generates:
+
+- `public/r/registry.json` - Main registry index
+- `public/r/button.json` - Component registry entry
+- `public/r/button-demo-preview.json` - Demo block for v0.dev
 
 ## License
 
 MIT
-# fumadocs-registry
