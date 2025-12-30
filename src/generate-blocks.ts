@@ -96,18 +96,12 @@ export async function generateDemoBlock(
     "utf-8",
   );
 
-  const additionalComponents = allComponents.filter(
-    (c) =>
-      c.name !== component.name &&
-      component.registryDependencies.some(
-        (dep) => dep.includes(c.name) || dep === c.name,
-      ),
-  );
-
+  // For blocks, we only include the page and main component file
+  // Internal dependencies will be installed via registryDependencies URL
   const demoContent = generateDemoPage(
     component,
     preview.code,
-    additionalComponents,
+    [],
   );
 
   const files = [
@@ -117,26 +111,7 @@ export async function generateDemoBlock(
       type: "registry:page" as const,
       target: `app/${component.name}/page.tsx`,
     },
-    {
-      path: `registry/${options.registry.name}/${component.name}/${component.name}.tsx`,
-      content: componentContent,
-      type: "registry:component" as const,
-      target: `components/ui/${component.name}.tsx`,
-    },
   ];
-
-  for (const addComp of additionalComponents) {
-    const addContent = await fs.readFile(
-      path.resolve(process.cwd(), addComp.sourcePath),
-      "utf-8",
-    );
-    files.push({
-      path: `registry/${options.registry.name}/${component.name}/${addComp.name}.tsx`,
-      content: addContent,
-      type: "registry:component" as const,
-      target: `components/ui/${addComp.name}.tsx`,
-    });
-  }
 
   const shadcnInExample = detectShadcnInCode(preview.code);
 

@@ -1,6 +1,6 @@
 {
   "name": "fumadocs-registry",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Automatic shadcn registry generation for component libraries built with Fumadocs",
   "keywords": [
     "fumadocs",
