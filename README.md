@@ -7,6 +7,7 @@ Automatic [shadcn registry](https://ui.shadcn.com/docs/registry) generation for 
 - Auto-generates `registry.json` and component JSONs
 - Auto-injects code into `<ComponentPreview>` in MDX
 - Extracts exports and dependencies automatically
+- **Automatic dependency bundling** for v0.dev compatibility
 - Zero manual configuration for component metadata
 
 ## Quick Start
@@ -165,6 +166,41 @@ The plugin generates:
 - `public/r/registry.json` - Main registry index
 - `public/r/button.json` - Component registry entry
 - `public/r/button-demo-preview.json` - Demo block for v0.dev
+
+## Automatic Dependency Bundling
+
+Since v0.3.0, fumadocs-registry automatically bundles internal dependencies directly into each component's `files` array. This ensures compatibility with v0.dev and the shadcn CLI.
+
+**How it works:**
+
+When a component imports internal utilities or other components from your registry:
+
+```tsx
+import { useControllableState } from "@/lib/use-controllable-state";
+import { cn } from "@/lib/utils";
+```
+
+Instead of creating separate `registryDependencies` URLs, fumadocs-registry will:
+
+1. Detect all internal imports recursively
+2. Bundle all required files into the component's `files` array
+3. Keep only external shadcn dependencies in `registryDependencies`
+
+**Example output:**
+
+```json
+{
+  "name": "card-input",
+  "files": [
+    { "target": "components/ui/card-input.tsx", ... },
+    { "target": "lib/use-controllable-state.ts", ... },
+    { "target": "lib/utils.ts", ... }
+  ],
+  "dependencies": ["clsx", "tailwind-merge"]
+}
+```
+
+This ensures v0.dev can resolve all imports without needing to fetch multiple registry entries.
 
 ## License
 

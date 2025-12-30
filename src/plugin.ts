@@ -5,15 +5,15 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
-import type { PluginOptions, ResolvedOptions, ComponentInfo } from "./types.js";
+import { generateAllDemoBlocks, writeDemoBlocks } from "./generate-blocks.js";
 import {
-  scanComponents,
-  generateRegistryJson,
-  generateComponentJsonFiles,
   generateBundleJson,
+  generateComponentJsonFiles,
+  generateRegistryJson,
+  scanComponents,
   writeRegistryFiles,
 } from "./generate-registry.js";
-import { generateAllDemoBlocks, writeDemoBlocks } from "./generate-blocks.js";
+import type { ComponentInfo, PluginOptions, ResolvedOptions } from "./types.js";
 
 /**
  * Resolve plugin options with defaults
@@ -84,9 +84,7 @@ async function scanMdxFiles(
   components: ComponentInfo[],
   options: ResolvedOptions,
 ): Promise<void> {
-  const docsDirs = options.docsDirs.map((d) =>
-    path.resolve(process.cwd(), d),
-  );
+  const docsDirs = options.docsDirs.map((d) => path.resolve(process.cwd(), d));
 
   for (const dir of docsDirs) {
     try {
@@ -150,4 +148,3 @@ async function scanMdxFiles(
 }
 
 export default buildRegistry;
-

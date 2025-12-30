@@ -14,4 +14,3 @@ export default defineConfig({
   target: "node18",
   shims: true,
 });
-

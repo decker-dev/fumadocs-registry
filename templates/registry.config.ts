@@ -7,4 +7,3 @@ export default {
     homepage: "{{HOMEPAGE}}",
   },
 } satisfies PluginOptions;
-

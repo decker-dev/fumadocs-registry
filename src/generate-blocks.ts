@@ -4,13 +4,13 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { detectShadcnInCode } from "./extract-dependencies.js";
 import type {
   ComponentInfo,
   ComponentPreviewData,
   RegistryItem,
   ResolvedOptions,
 } from "./types.js";
-import { detectShadcnInCode } from "./extract-dependencies.js";
 
 const SHADCN_IMPORTS: Record<string, string> = {
   Label: "label",
@@ -204,4 +204,3 @@ function kebabToPascal(str: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join("");
 }
-

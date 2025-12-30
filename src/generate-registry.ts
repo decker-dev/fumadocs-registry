@@ -4,18 +4,18 @@
 
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import type {
-  ComponentInfo,
-  Registry,
-  RegistryItem,
-  RegistryFile,
-  ResolvedOptions,
-} from "./types.js";
-import { extractExports } from "./extract-exports.js";
 import {
   extractDependencies,
   internalToRegistryDeps,
 } from "./extract-dependencies.js";
+import { extractExports } from "./extract-exports.js";
+import type {
+  ComponentInfo,
+  Registry,
+  RegistryFile,
+  RegistryItem,
+  ResolvedOptions,
+} from "./types.js";
 
 /**
  * Scan the components directory and build component info
@@ -129,7 +129,38 @@ export async function generateRegistryJson(
 }
 
 /**
+ * Recursively collect all internal dependencies for a component
+ */
+function collectInternalDeps(
+  componentName: string,
+  allComponents: ComponentInfo[],
+  collected: Set<string>,
+  baseUrl: string,
+): void {
+  if (collected.has(componentName)) return;
+
+  const component = allComponents.find((c) => c.name === componentName);
+  if (!component) return;
+
+  collected.add(componentName);
+
+  // Find internal deps from registryDependencies (URLs pointing to our own registry)
+  for (const dep of component.registryDependencies) {
+    if (dep.startsWith(baseUrl)) {
+      // Extract component name from URL like "https://billui.com/r/utils.json"
+      const depName = dep
+        .replace(baseUrl, "")
+        .replace(/^\//, "")
+        .replace(/\.json$/, "");
+      collectInternalDeps(depName, allComponents, collected, baseUrl);
+    }
+  }
+}
+
+/**
  * Generate individual component JSON files
+ * Bundles all internal dependencies directly into each component's files array
+ * so v0.dev can resolve imports without needing to fetch separate registry entries
  */
 export async function generateComponentJsonFiles(
   components: ComponentInfo[],
@@ -138,10 +169,48 @@ export async function generateComponentJsonFiles(
   const files = new Map<string, RegistryItem>();
 
   for (const component of components) {
-    const content = await fs.readFile(
-      path.resolve(process.cwd(), component.sourcePath),
-      "utf-8",
+    // Collect all internal dependencies recursively
+    const internalDeps = new Set<string>();
+    collectInternalDeps(
+      component.name,
+      components,
+      internalDeps,
+      options.baseUrl,
     );
+
+    // Build files array with main component + all internal deps
+    const registryFiles: RegistryFile[] = [];
+    const allNpmDeps = new Set<string>();
+    const externalRegistryDeps = new Set<string>();
+
+    for (const depName of internalDeps) {
+      const dep = components.find((c) => c.name === depName);
+      if (!dep) continue;
+
+      const content = await fs.readFile(
+        path.resolve(process.cwd(), dep.sourcePath),
+        "utf-8",
+      );
+
+      registryFiles.push({
+        path: dep.sourcePath,
+        content,
+        type: dep.type,
+        target: dep.targetPath,
+      });
+
+      // Collect npm dependencies
+      for (const npmDep of dep.dependencies) {
+        allNpmDeps.add(npmDep);
+      }
+
+      // Collect external registry dependencies (shadcn components)
+      for (const regDep of dep.registryDependencies) {
+        if (!regDep.startsWith(options.baseUrl)) {
+          externalRegistryDeps.add(regDep);
+        }
+      }
+    }
 
     const item: RegistryItem = {
       $schema: "https://ui.shadcn.com/schema/registry-item.json",
@@ -149,22 +218,15 @@ export async function generateComponentJsonFiles(
       type: component.type,
       title: component.title,
       description: component.description || `${component.title} component`,
-      files: [
-        {
-          path: component.sourcePath,
-          content,
-          type: component.type,
-          target: component.targetPath,
-        },
-      ],
+      files: registryFiles,
     };
 
-    if (component.dependencies.length > 0) {
-      item.dependencies = component.dependencies;
+    if (allNpmDeps.size > 0) {
+      item.dependencies = Array.from(allNpmDeps);
     }
 
-    if (component.registryDependencies.length > 0) {
-      item.registryDependencies = component.registryDependencies;
+    if (externalRegistryDeps.size > 0) {
+      item.registryDependencies = Array.from(externalRegistryDeps);
     }
 
     files.set(`${component.name}.json`, item);
@@ -260,4 +322,3 @@ function kebabToTitle(str: string): string {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
-

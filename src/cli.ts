@@ -23,9 +23,7 @@ async function loadConfig(): Promise<PluginOptions | null> {
       await fs.access(configPath);
       const config = await import(configPath);
       return config.default || config;
-    } catch {
-      continue;
-    }
+    } catch {}
   }
   return null;
 }
@@ -54,7 +52,7 @@ ${pc.dim("Options:")}
 }
 
 function printVersion() {
-  console.log("fumadocs-registry v0.2.1");
+  console.log("fumadocs-registry v0.3.0");
 }
 
 async function fileExists(filePath: string): Promise<boolean> {
@@ -120,7 +118,10 @@ async function runInit() {
     const content = template.replace("{{BASE_URL}}", baseUrl);
 
     await fs.writeFile(componentPath, content);
-    console.log(pc.green("created"), "src/components/docs/component-preview.tsx");
+    console.log(
+      pc.green("created"),
+      "src/components/docs/component-preview.tsx",
+    );
   }
 
   console.log(`
@@ -153,7 +154,7 @@ ${pc.bold("Next steps:")}
 
 4. Use in MDX:
 
-   ${pc.dim("<ComponentPreview component=\"button\" example=\"preview\">")}
+   ${pc.dim('<ComponentPreview component="button" example="preview">')}
      ${pc.dim("<Button>Click me</Button>")}
    ${pc.dim("</ComponentPreview>")}
 `);
@@ -164,7 +165,11 @@ async function runBuild() {
 
   if (!config) {
     console.error(pc.red("Error:"), "No config file found.");
-    console.log(pc.dim("\nRun"), "fumadocs-registry init", pc.dim("to get started."));
+    console.log(
+      pc.dim("\nRun"),
+      "fumadocs-registry init",
+      pc.dim("to get started."),
+    );
     process.exit(1);
   }
 

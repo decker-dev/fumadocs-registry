@@ -4,38 +4,40 @@
  * Automatic shadcn registry generation for component libraries built with Fumadocs
  */
 
-export { buildRegistry, resolveOptions } from "./plugin.js";
-export { remarkComponentPreview } from "./remark-plugin.js";
-export { extractExports, extractExportsFromContent } from "./extract-exports.js";
 export {
+  detectShadcnInCode,
   extractDependencies,
   extractDependenciesFromContent,
-  detectShadcnInCode,
 } from "./extract-dependencies.js";
 export {
-  scanComponents,
-  generateRegistryJson,
-  generateComponentJsonFiles,
-  generateBundleJson,
-  writeRegistryFiles,
-} from "./generate-registry.js";
+  extractExports,
+  extractExportsFromContent,
+} from "./extract-exports.js";
 export {
-  generateDemoPage,
-  generateDemoBlock,
   generateAllDemoBlocks,
+  generateDemoBlock,
+  generateDemoPage,
   writeDemoBlocks,
 } from "./generate-blocks.js";
+export {
+  generateBundleJson,
+  generateComponentJsonFiles,
+  generateRegistryJson,
+  scanComponents,
+  writeRegistryFiles,
+} from "./generate-registry.js";
+export { buildRegistry, resolveOptions } from "./plugin.js";
+export { remarkComponentPreview } from "./remark-plugin.js";
 
 export type {
-  PluginOptions,
-  ResolvedOptions,
   ComponentInfo,
   ComponentPreviewData,
-  RegistryItem,
+  ExtractedDependencies,
+  ExtractedExports,
+  PluginOptions,
   Registry,
   RegistryFile,
-  ExtractedExports,
-  ExtractedDependencies,
+  RegistryItem,
+  ResolvedOptions,
   VFileData,
 } from "./types.js";
-

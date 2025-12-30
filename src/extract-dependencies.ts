@@ -67,7 +67,10 @@ export function extractDependenciesFromContent(
   const registryDependencies: Set<string> = new Set();
   const internalDependencies: Set<string> = new Set();
 
-  const shadcnMap = { ...DEFAULT_SHADCN_COMPONENTS, ...options.shadcnComponents };
+  const shadcnMap = {
+    ...DEFAULT_SHADCN_COMPONENTS,
+    ...options.shadcnComponents,
+  };
 
   const importRegex =
     /import\s+(?:(?:\{[^}]*\}|\*\s+as\s+\w+|\w+)(?:\s*,\s*(?:\{[^}]*\}|\*\s+as\s+\w+|\w+))*\s+from\s+)?["']([^"']+)["']/g;
@@ -103,7 +106,7 @@ interface ImportCategory {
 function categorizeImport(
   importPath: string,
   filePath: string,
-  options: ResolvedOptions,
+  _options: ResolvedOptions,
   shadcnMap: Record<string, string>,
 ): ImportCategory {
   if (EXCLUDED_PACKAGES.has(importPath)) {
@@ -152,7 +155,9 @@ function categorizeImport(
 
   // lib import (@/lib/*)
   if (importPath.startsWith("@/lib/")) {
-    const libName = importPath.replace("@/lib/", "").replace(/\.(tsx?|jsx?)$/, "");
+    const libName = importPath
+      .replace("@/lib/", "")
+      .replace(/\.(tsx?|jsx?)$/, "");
     return { type: "internal", name: libName };
   }
 
@@ -192,4 +197,3 @@ export function detectShadcnInCode(
 
   return Array.from(detected);
 }
-

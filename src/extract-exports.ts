@@ -119,4 +119,3 @@ export function filterUtilityExports(exports: string[]): string[] {
     (name) => /^[a-z][a-zA-Z0-9]*$/.test(name) || /^[A-Z_]+$/.test(name),
   );
 }
-

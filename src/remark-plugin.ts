@@ -3,11 +3,11 @@
  * and injects them as the `code` prop at build time
  */
 import type { Root } from "mdast";
-import type { MdxJsxFlowElement, MdxJsxAttribute } from "mdast-util-mdx-jsx";
+import type { MdxJsxAttribute, MdxJsxFlowElement } from "mdast-util-mdx-jsx";
 import type { Transformer } from "unified";
 import { visit } from "unist-util-visit";
 import type { VFile } from "vfile";
-import type { ComponentPreviewData, VFileData } from "./types.js";
+import type { VFileData } from "./types.js";
 
 function isComponentPreview(node: unknown): node is MdxJsxFlowElement {
   return (
@@ -160,4 +160,3 @@ export function remarkComponentPreview(
 }
 
 export default remarkComponentPreview;
-
