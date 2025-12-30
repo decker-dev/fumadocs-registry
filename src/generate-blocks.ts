@@ -81,6 +81,9 @@ export default function Page() {
 
 /**
  * Generate demo block JSON for a single preview
+ *
+ * Blocks use registryDependencies to let the CLI install components,
+ * rather than bundling everything in files array
  */
 export async function generateDemoBlock(
   component: ComponentInfo,
@@ -136,9 +139,17 @@ export async function generateDemoBlock(
   }
 
   const shadcnInExample = detectShadcnInCode(preview.code);
+
+  // For blocks, include the component's own registry URL so CLI can install it with all its bundled deps
+  const componentRegistryUrl = `${options.baseUrl}/${component.name}.json`;
+
   const allRegistryDeps = [
-    ...new Set([...component.registryDependencies, ...shadcnInExample]),
-  ].filter((dep) => !dep.includes(options.baseUrl));
+    componentRegistryUrl,
+    ...component.registryDependencies.filter(
+      (dep) => !dep.includes(options.baseUrl),
+    ),
+    ...shadcnInExample,
+  ].filter((dep, index, self) => self.indexOf(dep) === index); // unique
 
   return {
     $schema: "https://ui.shadcn.com/schema/registry-item.json",

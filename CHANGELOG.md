@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2024-12-30
+
+### Fixed
+
+- Demo blocks now correctly reference the main component via `registryDependencies` instead of trying to bundle everything in `files`
+- This allows the shadcn CLI to properly resolve and install components with their bundled internal dependencies
+
+### Changed
+
+- Blocks now include the component's registry URL in `registryDependencies` (e.g., `https://billui.com/r/card-input.json`)
+- The CLI will fetch and install the component with all its bundled lib files automatically
+
 ## [0.3.0] - 2024-12-30
 
 ### Added
